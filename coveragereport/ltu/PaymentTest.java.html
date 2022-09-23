@@ -38,5 +38,113 @@ import ltu.PaymentImpl;
 <span class="fc" id="L38">    	assertEquals(FULL_LOAN + FULL_SUBSIDY, over_20);</span>
 <span class="fc" id="L39">    }</span>
 
+    @Test
+    // [ID: 102] The student may receive subsidiary until the year they turn 56.
+    public void age_102() throws IOException {
+<span class="fc" id="L44">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+    	
+    	// Student under 56
+<span class="fc" id="L47">    	int under_56 = payment.getMonthlyAmount(&quot;19661231-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L48">    	assertEquals(FULL_SUBSIDY, under_56);</span>
+    	
+    	// Student over 56
+<span class="fc" id="L51">    	int over_56 = payment.getMonthlyAmount(&quot;19651231-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L52">    	assertEquals(0, over_56);</span>
+<span class="fc" id="L53">    }</span>
+
+    @Test
+    // [ID: 103] The student may not receive any student loans from the year they turn 47.
+    public void age_103() throws IOException {
+<span class="fc" id="L58">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+    	
+    	// Student under 47
+<span class="fc" id="L61">    	int under_47 = payment.getMonthlyAmount(&quot;19761231-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L62">    	assertEquals(FULL_LOAN + FULL_SUBSIDY, under_47);</span>
+    	
+    	// Student over 47
+<span class="fc" id="L65">    	int over_47 = payment.getMonthlyAmount(&quot;19751231-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L66">    	assertEquals(FULL_SUBSIDY, over_47);</span>
+<span class="fc" id="L67">    }</span>
+
+    // Study pace requirements
+    @Test
+    // [ID: 201] The student must be studying at least half time to receive any subsidiary.
+    public void pace_201() throws IOException {
+<span class="fc" id="L73">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+    	
+    	// Study rate under 50
+<span class="fc" id="L76">    	int under_50 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 0, 49, 100);</span>
+<span class="fc" id="L77">    	assertEquals(0, under_50);</span>
+<span class="fc" id="L78">    }</span>
+
+    @Test
+    // [ID: 202] A student studying less than full time is entitled to 50% subsidiary.
+    public void pace_202() throws IOException {
+<span class="fc" id="L83">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+    	
+    	// Study rate equals 50
+<span class="fc" id="L86">    	int equal_50 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 0, 50, 100);</span>
+<span class="fc" id="L87">    	assertEquals(HALF_LOAN + HALF_SUBSIDY, equal_50);</span>
+
+        // Study rate under 100
+<span class="fc" id="L90">    	int under_100 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 0, 99, 100);</span>
+<span class="fc" id="L91">    	assertEquals(HALF_LOAN + HALF_SUBSIDY, under_100);</span>
+<span class="fc" id="L92">    }</span>
+
+    @Test
+    // [ID: 203] A student studying full time is entitled to 100% subsidiary.
+    public void pace_203() throws IOException {
+<span class="fc" id="L97">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+    	
+    	// Study rate equals 100
+<span class="fc" id="L100">    	int equal_50 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L101">    	assertEquals(FULL_LOAN + FULL_SUBSIDY, equal_50);</span>
+<span class="fc" id="L102">    }</span>
+
+
+    // Income while studying requirements
+    @Test
+    // [ID: 301] A student who is studying full time or more is permitted to earn a maximum of 85 813SEK per year in order to receive any subsidiary or student loans.
+    public void pace_301() throws IOException {
+<span class="fc" id="L109">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+
+        // Income equal to 85 813SEK, full study rate
+<span class="fc" id="L112">    	int equal_85813 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 85813, 100, 100);</span>
+<span class="fc" id="L113">    	assertEquals(FULL_LOAN + FULL_SUBSIDY, equal_85813);</span>
+
+        // Income over 85 813SEK, full study rate
+<span class="fc" id="L116">    	int over_85813 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 85814, 100, 100);</span>
+<span class="fc" id="L117">    	assertEquals(0, over_85813);</span>
+<span class="fc" id="L118">    }</span>
+
+    @Test
+    // [ID: 302] A student who is studying less than full time is allowed to earn a maximum of 128 722SEK per year in order to receive any subsidiary or student loans.
+    public void pace_302() throws IOException {
+<span class="fc" id="L123">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+
+        // Income equal to 128 722SEK, half study rate
+<span class="fc" id="L126">    	int equal_128722 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 128722, 50, 100);</span>
+<span class="fc" id="L127">    	assertEquals(HALF_LOAN + HALF_SUBSIDY, equal_128722);</span>
+
+        // Income over 128 722SEK, half study rate
+<span class="fc" id="L130">    	int over_128722 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 128723, 50, 100);</span>
+<span class="fc" id="L131">    	assertEquals(0, over_128722);</span>
+<span class="fc" id="L132">    }</span>
+
+
+    // Completion ratio requirement
+    @Test
+    // [ID: 401] A student must have completed at least 50% of previous studies in order to receive any subsidiary or student loans.
+    public void pace_401() throws IOException {
+<span class="fc" id="L139">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+
+        // Completed 50% of previous studies
+<span class="fc" id="L142">    	int equal_50 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 0, 100, 50);</span>
+<span class="fc" id="L143">    	assertEquals(FULL_LOAN + FULL_SUBSIDY, equal_50);</span>
+
+        // Completed under 50% of previous studies
+<span class="fc" id="L146">    	int under_49 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 0, 100, 49);</span>
+<span class="fc" id="L147">    	assertEquals(0, under_49);</span>
+<span class="fc" id="L148">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
