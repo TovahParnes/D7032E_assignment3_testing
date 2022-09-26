@@ -8,62 +8,62 @@ import org.junit.Test;
 import java.util.Calendar;
 import org.junit.Test;
 import ltu.PaymentImpl;
+import ltu.VT2016CalendarImpl;
 
-<span class="fc" id="L12">public class PaymentTest</span>
+<span class="fc" id="L13">public class PaymentTest</span>
 {
 
-<span class="fc" id="L15">    private int FULL_LOAN = 7088;</span>
-<span class="fc" id="L16">    private int HALF_LOAN = 3564;</span>
-<span class="fc" id="L17">    private int ZERO_LOAN = 0;</span>
-<span class="fc" id="L18">    private int FULL_SUBSIDY = 2816;</span>
-<span class="fc" id="L19">    private int HALF_SUBSIDY = 1396;</span>
-<span class="fc" id="L20">    private int ZERO_SUBSIDY = 1396;</span>
-<span class="fc" id="L21">    private int FULLTIME_INCOME = 85813;</span>
-<span class="fc" id="L22">    private int PARTTIME_INCOME = 128722;</span>
-    private ICalendar calendar;
+<span class="fc" id="L16">    private final int FULL_LOAN = 7088;</span>
+<span class="fc" id="L17">    private final int HALF_LOAN = 3564;</span>
+<span class="fc" id="L18">    private final int ZERO_LOAN = 0;</span>
+<span class="fc" id="L19">    private final int FULL_SUBSIDY = 2816;</span>
+<span class="fc" id="L20">    private final int HALF_SUBSIDY = 1396;</span>
+<span class="fc" id="L21">    private final int ZERO_SUBSIDY = 0;</span>
+<span class="fc" id="L22">    private final int FULLTIME_INCOME = 85813;</span>
+<span class="fc" id="L23">    private final int PARTTIME_INCOME = 128722;</span>
 
 
     //Age requirements
     @Test
     // [ID: 101] The student must be at least 20 years old to receive subsidiary and student loans.
     public void age_101() throws IOException {
-<span class="fc" id="L30">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+<span class="fc" id="L30">    	PaymentImpl payment = new PaymentImpl(new VT2016CalendarImpl());</span>
     	
     	// Student under 20
-<span class="fc" id="L33">    	int under_20 = payment.getMonthlyAmount(&quot;20100101-0000&quot;, 0, 100, 100);</span>
-<span class="fc" id="L34">    	assertEquals(0, under_20);</span>
+<span class="fc" id="L33">    	int under_20 = payment.getMonthlyAmount(&quot;20040101-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L34">    	assertEquals(ZERO_LOAN + ZERO_SUBSIDY, under_20);</span>
     	
     	// Student over 20
-<span class="fc" id="L37">    	int over_20 = payment.getMonthlyAmount(&quot;19970101-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L37">    	int over_20 = payment.getMonthlyAmount(&quot;19910101-0000&quot;, 0, 100, 100);</span>
 <span class="fc" id="L38">    	assertEquals(FULL_LOAN + FULL_SUBSIDY, over_20);</span>
 <span class="fc" id="L39">    }</span>
 
     @Test
     // [ID: 102] The student may receive subsidiary until the year they turn 56.
     public void age_102() throws IOException {
-<span class="fc" id="L44">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+<span class="fc" id="L44">    	PaymentImpl payment = new PaymentImpl(new VT2016CalendarImpl());</span>
     	
     	// Student under 56
-<span class="fc" id="L47">    	int under_56 = payment.getMonthlyAmount(&quot;19661231-0000&quot;, 0, 100, 100);</span>
-<span class="fc" id="L48">    	assertEquals(FULL_SUBSIDY, under_56);</span>
+<span class="fc" id="L47">    	int under_56 = payment.getMonthlyAmount(&quot;19601231-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L48">    	assertEquals(FULL_SUBSIDY + ZERO_SUBSIDY, under_56);</span>
     	
     	// Student over 56
-<span class="fc" id="L51">    	int over_56 = payment.getMonthlyAmount(&quot;19651231-0000&quot;, 0, 100, 100);</span>
-<span class="fc" id="L52">    	assertEquals(0, over_56);</span>
+<span class="fc" id="L51">    	int over_56 = payment.getMonthlyAmount(&quot;19591231-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L52">    	assertEquals(ZERO_LOAN + ZERO_SUBSIDY, over_56);</span>
 <span class="fc" id="L53">    }</span>
 
     @Test
     // [ID: 103] The student may not receive any student loans from the year they turn 47.
     public void age_103() throws IOException {
-<span class="fc" id="L58">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+<span class="fc" id="L58">    	PaymentImpl payment = new PaymentImpl(new VT2016CalendarImpl());</span>
     	
     	// Student under 47
-<span class="fc" id="L61">    	int under_47 = payment.getMonthlyAmount(&quot;19761231-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L61">    	int under_47 = payment.getMonthlyAmount(&quot;19701231-0000&quot;, 0, 100, 100);</span>
 <span class="fc" id="L62">    	assertEquals(FULL_LOAN + FULL_SUBSIDY, under_47);</span>
     	
     	// Student over 47
-<span class="fc" id="L65">    	int over_47 = payment.getMonthlyAmount(&quot;19751231-0000&quot;, 0, 100, 100);</span>
-<span class="fc" id="L66">    	assertEquals(FULL_SUBSIDY, over_47);</span>
+<span class="fc" id="L65">    	int over_47 = payment.getMonthlyAmount(&quot;19691231-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L66">    	assertEquals(ZERO_LOAN + FULL_SUBSIDY, over_47);</span>
 <span class="fc" id="L67">    }</span>
 
     // Study pace requirements
@@ -74,7 +74,7 @@ import ltu.PaymentImpl;
     	
     	// Study rate under 50
 <span class="fc" id="L76">    	int under_50 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 0, 49, 100);</span>
-<span class="fc" id="L77">    	assertEquals(0, under_50);</span>
+<span class="fc" id="L77">    	assertEquals(ZERO_LOAN + ZERO_SUBSIDY, under_50);</span>
 <span class="fc" id="L78">    }</span>
 
     @Test
@@ -109,12 +109,12 @@ import ltu.PaymentImpl;
 <span class="fc" id="L109">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
 
         // Income equal to 85 813SEK, full study rate
-<span class="fc" id="L112">    	int equal_85813 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 85813, 100, 100);</span>
+<span class="fc" id="L112">    	int equal_85813 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, FULLTIME_INCOME, 100, 100);</span>
 <span class="fc" id="L113">    	assertEquals(FULL_LOAN + FULL_SUBSIDY, equal_85813);</span>
 
         // Income over 85 813SEK, full study rate
-<span class="fc" id="L116">    	int over_85813 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 85814, 100, 100);</span>
-<span class="fc" id="L117">    	assertEquals(0, over_85813);</span>
+<span class="fc" id="L116">    	int over_85813 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, FULLTIME_INCOME + 1, 100, 100);</span>
+<span class="fc" id="L117">    	assertEquals(ZERO_LOAN + ZERO_SUBSIDY, over_85813);</span>
 <span class="fc" id="L118">    }</span>
 
     @Test
@@ -123,12 +123,12 @@ import ltu.PaymentImpl;
 <span class="fc" id="L123">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
 
         // Income equal to 128 722SEK, half study rate
-<span class="fc" id="L126">    	int equal_128722 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 128722, 50, 100);</span>
+<span class="fc" id="L126">    	int equal_128722 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, PARTTIME_INCOME, 50, 100);</span>
 <span class="fc" id="L127">    	assertEquals(HALF_LOAN + HALF_SUBSIDY, equal_128722);</span>
 
         // Income over 128 722SEK, half study rate
-<span class="fc" id="L130">    	int over_128722 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 128723, 50, 100);</span>
-<span class="fc" id="L131">    	assertEquals(0, over_128722);</span>
+<span class="fc" id="L130">    	int over_128722 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, PARTTIME_INCOME + 1, 50, 100);</span>
+<span class="fc" id="L131">    	assertEquals(ZERO_LOAN + ZERO_SUBSIDY, over_128722);</span>
 <span class="fc" id="L132">    }</span>
 
 
@@ -146,5 +146,27 @@ import ltu.PaymentImpl;
 <span class="fc" id="L146">    	int under_49 = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 0, 100, 49);</span>
 <span class="fc" id="L147">    	assertEquals(0, under_49);</span>
 <span class="fc" id="L148">    }</span>
+
+    @Test
+    // Full time students are entitled to:
+    // [ID: 501] Student loan: 7088 SEK / month
+    // [ID: 502] Subsidiary: 2816 SEK / month
+    public void pace_501() throws IOException {
+<span class="fc" id="L155">    	PaymentImpl payment = new PaymentImpl(getCalendar());</span>
+
+        // full time
+<span class="fc" id="L158">    	int full_time = payment.getMonthlyAmount(&quot;20000001-0000&quot;, 0, 100, 100);</span>
+<span class="fc" id="L159">    	assertEquals(FULL_LOAN + FULL_SUBSIDY, full_time);</span>
+<span class="fc" id="L160">    }</span>
+
+    @Test
+    // [ID: 506] Student loans and subsidiary is paid on the last weekday (Monday to Friday) every month.
+    public void pace_506() throws IOException {
+<span class="fc" id="L165">    	PaymentImpl payment = new PaymentImpl(new VT2016CalendarImpl());</span>
+
+        // payment day is a sunday
+<span class="fc" id="L168">    	String payment_day = payment.getNextPaymentDay();</span>
+<span class="fc" id="L169">    	assertEquals(&quot;20160129&quot;, payment_day);</span>
+<span class="fc" id="L170">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
