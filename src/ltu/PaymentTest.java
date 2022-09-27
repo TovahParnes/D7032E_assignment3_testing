@@ -32,6 +32,10 @@ public class PaymentTest
     	// Student under 20
     	int under_20 = payment.getMonthlyAmount("20040101-0000", 0, 100, 100);
     	assertEquals(ZERO_LOAN + ZERO_SUBSIDY, under_20);
+
+        // Student equal 20
+    	int equal_20 = payment.getMonthlyAmount("19960101-0000", 0, 100, 100);
+    	assertEquals(FULL_LOAN + FULL_SUBSIDY, equal_20);
     	
     	// Student over 20
     	int over_20 = payment.getMonthlyAmount("19910101-0000", 0, 100, 100);
@@ -150,13 +154,57 @@ public class PaymentTest
     @Test
     // Full time students are entitled to:
     // [ID: 501] Student loan: 7088 SEK / month
-    // [ID: 502] Subsidiary: 2816 SEK / month
     public void pace_501() throws IOException {
     	PaymentImpl payment = new PaymentImpl(getCalendar());
 
-        // full time
+        // full time, check loan
     	int full_time = payment.getMonthlyAmount("20000001-0000", 0, 100, 100);
-    	assertEquals(FULL_LOAN + FULL_SUBSIDY, full_time);
+    	assertEquals(FULL_LOAN, full_time - FULL_SUBSIDY);
+    }
+
+    @Test
+    // Full time students are entitled to:
+    // [ID: 502] Subsidiary: 2816 SEK / month
+    public void pace_502() throws IOException {
+    	PaymentImpl payment = new PaymentImpl(getCalendar());
+
+        // full time, check subsiday
+    	int full_time = payment.getMonthlyAmount("20000001-0000", 0, 100, 100);
+    	assertEquals(FULL_SUBSIDY, full_time - FULL_LOAN);
+    }
+
+    @Test
+    // Less than full time students are entitled to:
+    // [ID: 503] Student loan: 3564 SEK / month
+    public void pace_503() throws IOException {
+    	PaymentImpl payment = new PaymentImpl(getCalendar());
+
+        // not full time, check loan
+    	int not_full_time = payment.getMonthlyAmount("20000001-0000", 0, 99, 100);
+    	assertEquals(HALF_LOAN, not_full_time - HALF_SUBSIDY);
+    }
+
+    @Test
+    // Less than full time students are entitled to:
+    // [ID: 504] Subsidiary: 1396 SEK / month
+    public void pace_504() throws IOException {
+    	PaymentImpl payment = new PaymentImpl(getCalendar());
+
+        // not full time, check subsidary
+    	int not_full_time = payment.getMonthlyAmount("20000001-0000", 0, 99, 100);
+    	assertEquals(HALF_SUBSIDY, not_full_time - HALF_LOAN);
+    }
+
+    @Test
+    // [ID: 505] A person who is entitled to receive a student loan will always receive the full amount.
+    public void full_amount505() throws IOException {
+    	PaymentImpl payment = new PaymentImpl(getCalendar());
+    	
+    	int full_amount_full_time = payment.getMonthlyAmount("19970101-0000", 0, 100, 100);
+    	assertEquals(FULL_LOAN + FULL_SUBSIDY, full_amount_full_time);
+    	
+    	int full_amount_half_time = payment.getMonthlyAmount("19970101-0000", 0, 50, 100);
+    	assertEquals(HALF_LOAN + HALF_SUBSIDY, full_amount_half_time);
     }
 
     @Test
