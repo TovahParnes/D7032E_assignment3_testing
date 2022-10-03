@@ -68,6 +68,10 @@ public class PaymentTest
     	// Student over 47
     	int over_47 = payment.getMonthlyAmount("19691231-0000", 0, 100, 100);
     	assertEquals(ZERO_LOAN + FULL_SUBSIDY, over_47);
+
+        // Student over 47
+    	int equal_49 = payment.getMonthlyAmount("19681231-0000", 0, 100, 100);
+    	assertEquals(ZERO_LOAN + FULL_SUBSIDY, equal_49);
     }
 
     // Study pace requirements
@@ -209,11 +213,19 @@ public class PaymentTest
 
     @Test
     // [ID: 506] Student loans and subsidiary is paid on the last weekday (Monday to Friday) every month.
-    public void pace_506() throws IOException {
+    public void pace_506Sunday() throws IOException {
     	PaymentImpl payment = new PaymentImpl(new VT2016CalendarImpl());
 
         // payment day is a sunday
     	String payment_day = payment.getNextPaymentDay();
     	assertEquals("20160129", payment_day);
+    }
+
+    public void pace_506Saturday() throws IOException {
+    	PaymentImpl payment = new PaymentImpl(new VT2016SaturdayCalendarImpl());
+
+        // payment day is a sunday
+    	String payment_day = payment.getNextPaymentDay();
+    	assertEquals("20160429", payment_day);
     }
 }
